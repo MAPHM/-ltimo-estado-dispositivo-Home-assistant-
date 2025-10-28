@@ -1,0 +1,16 @@
+script:
+  enviar_notif_ultima_activacion_mov_sala:
+    alias: Enviar notificación: última activación
+    mode: single
+    sequence:
+      - service: notify.mobile_app_pixel       # 👈 tu servicio de notificación
+        data:
+          title: >-
+            Última activación — {{ states.binary_sensor.movimiento_sala.name }}
+          message: >-
+            {% set dt = states('input_datetime.ultima_activacion_mov_sala') %}
+            {% if dt in ['unknown','unavailable',''] %}
+              Aún no hay registros de activación.
+            {% else %}
+              {{ (as_local(as_datetime(dt))).strftime('%d/%m/%Y %H:%M:%S') }}
+            {% endif %}
