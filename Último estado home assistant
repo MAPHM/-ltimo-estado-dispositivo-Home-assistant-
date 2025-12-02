@@ -1,53 +1,11 @@
-
-alias: Alarma
-description: ""
-triggers:
-  - type: opened
-    device_id: 97254b8259f8e2d1a7357ad888ce6012
-    entity_id: f8ced0b45fb9a9ba9d44353c1022eb52
-    domain: binary_sensor
-    trigger: device
-conditions: []
-actions:
-  - action: siren.turn_on
-    metadata: {}
-    data: {}
+alias: MA Tidal
+sequence:
+  - data:
+      media_type: artist
+      enqueue: play
+      media_id: tidal://artist/9706
+    action: music_assistant.play_media
     target:
-      entity_id: siren.camara_sala_sirena
-  - action: siren.turn_on
-    metadata: {}
-    data: {}
-    target:
-      entity_id: siren.camara_patio_sirena
-  - action: media_player.play_media
-    metadata: {}
-    data:
-      media:
-        media_content_id: media-source://media_source/local/Alarma De Auto.mp3
-        media_content_type: audio/mpeg
-        metadata:
-          title: Alarma De Auto.mp3
-          thumbnail: null
-          media_class: music
-          children_media_class: null
-          navigateIds:
-            - {}
-            - media_content_type: app
-              media_content_id: media-source://media_source
-          browse_entity_id: media_player.nesthuba4cb
-    target:
-      entity_id:
-        - media_player.nesthuba4cb_2
-  - action: notify.send_message
-    metadata: {}
-    data:
-      message: Llamando a la policía local
-    target:
-      entity_id: notify.sala_hablar
-  - action: telegram_bot.send_message
-    data:
-      config_entry_id: 01K8C6SZ9BFMZ2G9KHTDNA9G3R
-      message: Puerta abierta
-      target:
-        - "-49941935"
+      entity_id: media_player.nesthuba4cb_2
 mode: single
+description: ""
