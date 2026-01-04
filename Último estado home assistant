@@ -1,11 +1,63 @@
-alias: MA Tidal
-sequence:
-  - data:
-      media_type: artist
-      enqueue: play
-      media_id: tidal://artist/9706
-    action: music_assistant.play_media
-    target:
-      entity_id: media_player.nesthuba4cb_2
-mode: single
+alias: Barra de Sonido
 description: ""
+triggers:
+  - device_id: 4083ba432881ff28617094ac300f321f
+    domain: media_player
+    entity_id: 0400384516f537b5f9417d22a20916e3
+    type: turned_on
+    trigger: device
+    id: "On"
+    enabled: false
+  - trigger: state
+    entity_id:
+      - media_player.lg_oled_2
+    from:
+      - "off"
+      - unavailable
+    to:
+      - "on"
+    id: "On"
+  - trigger: event
+    event_type: mobile_app_notification_action
+    event_data:
+      action: barra_on
+    id: Barra on
+    enabled: true
+conditions: []
+actions:
+  - delay:
+      hours: 0
+      minutes: 0
+      seconds: 8
+      milliseconds: 0
+  - choose:
+      - conditions:
+          - condition: trigger
+            id:
+              - "On"
+          - condition: state
+            entity_id: input_boolean.barra_son
+            state:
+              - "off"
+        sequence:
+          - action: notify.mobile_app_s25_ultra
+            data:
+              message: "¿Quieres encender la barra de sonido? "
+              data:
+                actions:
+                  - action: barra_on
+                    title: Sí
+                  - action: no_barra
+                    title: "No"
+      - conditions:
+          - condition: trigger
+            id:
+              - Barra on
+        sequence:
+          - action: webostv.select_sound_output
+            metadata: {}
+            data:
+              entity_id: media_player.lg_oled_2
+              sound_output: external_optical
+mode: single
+ 
