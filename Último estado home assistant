@@ -1,63 +1,330 @@
-alias: Barra de Sonido
+alias: Bomba
 description: ""
 triggers:
-  - device_id: 4083ba432881ff28617094ac300f321f
-    domain: media_player
-    entity_id: 0400384516f537b5f9417d22a20916e3
-    type: turned_on
+  - type: turned_on
+    device_id: 102649f67f07cf0d089ca09b945a1c3f
+    entity_id: 99871444e470ff7b8c15f26277733e86
+    domain: switch
     trigger: device
-    id: "On"
-    enabled: false
+    id: Bomba on
   - trigger: state
     entity_id:
-      - media_player.lg_oled_2
-    from:
-      - "off"
-      - unavailable
-    to:
-      - "on"
-    id: "On"
+      - timer.timer_bomba
+      - timer.timer_bomba_2
+      - timer.timer_bomba_3
+    to: idle
+    id: Timer Bomba Off
   - trigger: event
-    event_type: mobile_app_notification_action
+    event_type: telegram_callback
     event_data:
-      action: barra_on
-    id: Barra on
+      command: /bomba
+    id: Telegram Bomba
+  - trigger: event
+    event_type: telegram_command
+    event_data:
+      command: /bomba
+    id: Info bomba
     enabled: true
+  - type: turned_off
+    device_id: 102649f67f07cf0d089ca09b945a1c3f
+    entity_id: 99871444e470ff7b8c15f26277733e86
+    domain: switch
+    trigger: device
+    id: Bomba off
 conditions: []
 actions:
-  - delay:
-      hours: 0
-      minutes: 0
-      seconds: 8
-      milliseconds: 0
   - choose:
       - conditions:
           - condition: trigger
             id:
-              - "On"
-          - condition: state
-            entity_id: input_boolean.barra_son
-            state:
-              - "off"
+              - Bomba on
+          - condition: numeric_state
+            entity_id: sensor.notif_alexa_bomba_48
+            below: 108000
         sequence:
-          - action: notify.mobile_app_s25_ultra
+          - target:
+              entity_id:
+                - timer.timer_bomba_3
+            data: {}
+            action: timer.start
+          - action: telegram_bot.send_message
             data:
-              message: "¿Quieres encender la barra de sonido? "
-              data:
-                actions:
-                  - action: barra_on
-                    title: Sí
-                  - action: no_barra
-                    title: "No"
+              config_entry_id: 01K8C6SZ9BFMZ2G9KHTDNA9G3R
+              message: Bomba encendida
+              target:
+                - "-4994193597"
+          - action: telegram_bot.send_message
+            data:
+              config_entry_id: 01K8C6SZ9BFMZ2G9KHTDNA9G3R
+              target:
+                - "-4994193597"
+              message: >-
+                La bomba fue activada hace un día aproximadamente , por lo
+                tanto, el dispositivo se apagará automáticamente dentro de 45
+                minutos o puedes hacerlo en el momento que lo desees. 
+          - action: media_player.play_media
+            metadata: {}
+            data:
+              media:
+                media_content_id: media-source://media_source/local/Bomba activada.wav
+                media_content_type: audio/x-wav
+                metadata:
+                  title: Bomba activada.wav
+                  thumbnail: null
+                  media_class: music
+                  children_media_class: null
+                  navigateIds:
+                    - {}
+                    - media_content_type: app
+                      media_content_id: media-source://media_source
+                  browse_entity_id: media_player.nesthuba4cb_2
+              announce: true
+            target:
+              entity_id:
+                - media_player.nesthuba4cb_2
+          - delay:
+              hours: 0
+              minutes: 0
+              seconds: 5
+              milliseconds: 0
+          - action: media_player.play_media
+            metadata: {}
+            data:
+              media:
+                media_content_id: media-source://media_source/local/bomba 45.wav
+                media_content_type: audio/x-wav
+                metadata:
+                  title: bomba 45.wav
+                  thumbnail: null
+                  media_class: music
+                  children_media_class: null
+                  navigateIds:
+                    - {}
+                    - media_content_type: app
+                      media_content_id: media-source://media_source
+                  browse_entity_id: media_player.nesthuba4cb_2
+              announce: true
+            target:
+              entity_id:
+                - media_player.nesthuba4cb_2
+          - action: input_datetime.set_datetime
+            data:
+              datetime: "{{ now() }}"
+            target:
+              entity_id: input_datetime.registro_bomba
       - conditions:
           - condition: trigger
             id:
-              - Barra on
+              - Bomba on
+          - condition: numeric_state
+            entity_id: sensor.notif_alexa_bomba_48
+            below: 144000
+            above: 108000
         sequence:
-          - action: webostv.select_sound_output
+          - target:
+              entity_id:
+                - timer.timer_bomba_2
+            data: {}
+            action: timer.start
+          - action: telegram_bot.send_message
+            data:
+              config_entry_id: 01K8C6SZ9BFMZ2G9KHTDNA9G3R
+              message: "Bomba encendida. "
+              target:
+                - "-4994193597"
+          - action: telegram_bot.send_message
+            data:
+              config_entry_id: 01K8C6SZ9BFMZ2G9KHTDNA9G3R
+              target:
+                - "-4994193597"
+              message: >-
+                La bomba fue activada hace poco menos de 48 horas, por lo tanto,
+                el dispositivo se apagará en 60 minutos, sin embargo, tú lo
+                puedes apagar en el momento que lo desees. 
+          - action: media_player.play_media
             metadata: {}
             data:
-              entity_id: media_player.lg_oled_2
-              sound_output: external_optical
+              media:
+                media_content_id: media-source://media_source/local/Bomba activada.wav
+                media_content_type: audio/x-wav
+                metadata:
+                  title: Bomba activada.wav
+                  thumbnail: null
+                  media_class: music
+                  children_media_class: null
+                  navigateIds:
+                    - {}
+                    - media_content_type: app
+                      media_content_id: media-source://media_source
+                  browse_entity_id: media_player.nesthuba4cb_2
+              announce: true
+            target:
+              entity_id:
+                - media_player.nesthuba4cb_2
+          - delay:
+              hours: 0
+              minutes: 0
+              seconds: 3
+              milliseconds: 0
+          - action: media_player.play_media
+            metadata: {}
+            data:
+              media:
+                media_content_id: media-source://media_source/local/bomba 60.wav
+                media_content_type: audio/x-wav
+                metadata:
+                  title: bomba 60.wav
+                  thumbnail: null
+                  media_class: music
+                  children_media_class: null
+                  navigateIds:
+                    - {}
+                    - media_content_type: app
+                      media_content_id: media-source://media_source
+                  browse_entity_id: media_player.nesthuba4cb_2
+              announce: true
+            target:
+              entity_id:
+                - media_player.nesthuba4cb_2
+          - action: input_datetime.set_datetime
+            data:
+              datetime: "{{ now() }}"
+            target:
+              entity_id: input_datetime.registro_bomba
+      - conditions:
+          - condition: trigger
+            id:
+              - Bomba on
+          - condition: numeric_state
+            entity_id: sensor.notif_alexa_bomba_48
+            above: 144000
+        sequence:
+          - target:
+              entity_id: timer.timer_bomba
+            data: {}
+            action: timer.start
+          - action: telegram_bot.send_message
+            data:
+              config_entry_id: 01K8C6SZ9BFMZ2G9KHTDNA9G3R
+              message: Bomba encendida
+              target:
+                - "-4994193597"
+          - action: media_player.play_media
+            metadata: {}
+            data:
+              media:
+                media_content_id: media-source://media_source/local/Bomba activada.wav
+                media_content_type: audio/x-wav
+                metadata:
+                  title: Bomba activada.wav
+                  thumbnail: null
+                  media_class: music
+                  children_media_class: null
+                  navigateIds:
+                    - {}
+                    - media_content_type: app
+                      media_content_id: media-source://media_source
+                  browse_entity_id: media_player.nesthuba4cb_2
+              announce: true
+            target:
+              entity_id:
+                - media_player.nesthuba4cb_2
+          - delay:
+              hours: 0
+              minutes: 0
+              seconds: 3
+              milliseconds: 0
+          - action: media_player.play_media
+            metadata: {}
+            data:
+              media:
+                media_content_id: media-source://media_source/local/bomba 90.wav
+                media_content_type: audio/x-wav
+                metadata:
+                  title: bomba 90.wav
+                  thumbnail: null
+                  media_class: music
+                  children_media_class: null
+                  navigateIds:
+                    - {}
+                    - media_content_type: app
+                      media_content_id: media-source://media_source
+                  browse_entity_id: media_player.nesthuba4cb_2
+              announce: true
+            target:
+              entity_id:
+                - media_player.nesthuba4cb_2
+          - action: input_datetime.set_datetime
+            data:
+              datetime: "{{ now() }}"
+            target:
+              entity_id: input_datetime.registro_bomba
+      - conditions:
+          - condition: trigger
+            id:
+              - Timer Bomba Off
+        sequence:
+          - type: turn_off
+            device_id: 102649f67f07cf0d089ca09b945a1c3f
+            entity_id: 99871444e470ff7b8c15f26277733e86
+            domain: switch
+      - conditions:
+          - condition: trigger
+            id:
+              - Telegram Bomba
+        sequence:
+          - action: switch.turn_on
+            metadata: {}
+            data: {}
+            target:
+              entity_id: switch.bomba_3
+      - conditions:
+          - condition: trigger
+            id:
+              - Info bomba
+        sequence:
+          - action: script.turn_on
+            target:
+              entity_id: script.notificacion_bomba
+            data: {}
+          - delay:
+              hours: 0
+              minutes: 0
+              seconds: 3
+              milliseconds: 0
+          - action: script.turn_off
+            target:
+              entity_id: script.notificacion_bomba
+            data: {}
+      - conditions:
+          - condition: trigger
+            id:
+              - Bomba off
+        sequence:
+          - action: media_player.play_media
+            metadata: {}
+            data:
+              media:
+                media_content_id: media-source://media_source/local/Bomba desactivada.wav
+                media_content_type: audio/x-wav
+                metadata:
+                  title: Bomba desactivada.wav
+                  thumbnail: null
+                  media_class: music
+                  children_media_class: null
+                  navigateIds:
+                    - {}
+                    - media_content_type: app
+                      media_content_id: media-source://media_source
+                  browse_entity_id: media_player.nesthuba4cb_2
+              announce: true
+            target:
+              entity_id:
+                - media_player.nesthuba4cb_2
+          - action: telegram_bot.send_message
+            data:
+              config_entry_id: 01K8C6SZ9BFMZ2G9KHTDNA9G3R
+              message: Bomba apagada
+              target:
+                - "-4994193597"
 mode: single
- 
